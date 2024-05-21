@@ -1,68 +1,52 @@
-# Example file showing a circle moving on screen
 import pygame
 
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
+
 clock = pygame.time.Clock()
 running = True
 dt = 0
-aux=0
-
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+current_direction = None
+player_pos = pygame.Vector2(screen.get_width() - 1240, screen.get_height() / 2)
 
 while running:
     # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # fill the screen with a color to wipe away anything from last frame
+    
     screen.fill("purple")
-
-    pygame.draw.circle(screen, "red", player_pos, 40)
+    pygame.draw.circle(screen, "violet", player_pos, 20)
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_w]:
-        aux=1
-    if keys[pygame.K_s]:
-        aux=2
-    if keys[pygame.K_a]:
-        aux=3
-    if keys[pygame.K_d]:
-        aux=4
-        
-   
-    if aux==1:
-        player_pos.y -= 300 * dt
-    elif aux==2:
-        player_pos.y += 300 * dt
-    elif aux==3:
-        player_pos.x -= 300 * dt
-    elif aux==4:
-        player_pos.x += 300 * dt
 
-    if 760 < player_pos.y:
-        player_pos.y = 0
+    if keys[pygame.K_w] and current_direction != "down":
+        current_direction = "up"
+    elif keys[pygame.K_s] and current_direction != "up":
+        current_direction = "down"
+    elif keys[pygame.K_a] and current_direction != "right":
+        current_direction = "left"
+    elif keys[pygame.K_d] and current_direction != "left":
+        current_direction = "right"
 
-    if -44 > player_pos.y:
-        player_pos.y = 750
+    if current_direction == "up":
+        player_pos.y -= 300 * dt if player_pos.y > 0 else 0
+    elif current_direction == "down":
+        player_pos.y += 300 * dt if player_pos.y < screen.get_height() else 0
+    
+    elif current_direction == "left":
+        player_pos.x -= 300 * dt if player_pos.x > 0 else 0
 
-    if 1280 < player_pos.x:
-        player_pos.x = 0
-
-    if -44 > player_pos.x:
-        player_pos.x = 1280
+    elif current_direction == "right":
+        player_pos.x += 300 * dt if player_pos.x < screen.get_width() else 0
 
 
-    print(keys[pygame.K_a])
-    # flip() the display to put your work on screen
+    #flip() the display to put your work on screen
     pygame.display.flip()
 
     # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
     dt = clock.tick(60) / 1000
 
 pygame.quit()
